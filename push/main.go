@@ -1,3 +1,27 @@
+// Send Apple Push notification
+//
+//  ./push [-params] <token> [<token2> [...]]
+//    -a    use production service
+//    -b badge
+//          badge number
+//    -c certificate
+//          push certificate (default "cert.p12")
+//    -f file
+//          JSON file with push message
+//    -p password
+//          certificate password
+//    -t text
+//          message text (default "Hello!")
+//
+//  Sample JSON file:
+//    {
+//      "payload": {
+//        "aps": {
+//          "alert": "message",
+//          "badge": 0
+//        }
+//      }
+//    }
 package main
 
 import (
@@ -15,7 +39,7 @@ import (
 func main() {
 	certFileName := flag.String("c", "cert.p12", "push `certificate`")
 	password := flag.String("p", "", "certificate `password`")
-	production := flag.Bool("a", false, "use `production` service")
+	production := flag.Bool("a", false, "use production service")
 	notificationFileName := flag.String("f", "", "JSON `file` with push message")
 	alert := flag.String("t", "Hello!", "message `text`")
 	badge := flag.Uint("b", 0, "`badge` number")
@@ -65,7 +89,7 @@ func main() {
 	} else {
 		log.Fatalln("Nothing to send")
 	}
-	cert, err := apns.LoadTLSCertificate(*certFileName, *password)
+	cert, err := apns.LoadCertificate(*certFileName, *password)
 	if err != nil {
 		log.Fatalln("Error loading certificate:", err)
 	}

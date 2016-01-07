@@ -9,7 +9,7 @@ import (
 )
 
 // Декодирует и проверяет валидность сертификата в формат p12.
-func TLSCertificate(p12 []byte, password string) (tlsCert tls.Certificate, err error) {
+func Certificate(p12 []byte, password string) (tlsCert tls.Certificate, err error) {
 	privateKey, cert, err := pkcs12.Decode(p12, password) // декодируем сертификат
 	if err != nil {
 		return
@@ -31,10 +31,10 @@ func TLSCertificate(p12 []byte, password string) (tlsCert tls.Certificate, err e
 
 // LoadTLSCertificate загружает и разбирает сертификат в формате p12 из файла. Возвращает разобранный
 // сертификат или ошибку.
-func LoadTLSCertificate(filename, password string) (tlsCert tls.Certificate, err error) {
+func LoadCertificate(filename, password string) (tlsCert tls.Certificate, err error) {
 	p12, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return
 	}
-	return TLSCertificate(p12, password)
+	return Certificate(p12, password)
 }
