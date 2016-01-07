@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/mdigger/apns3"
+	"github.com/geotrace/apns3"
 )
 
 func Example() {
