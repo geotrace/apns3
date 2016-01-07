@@ -2,7 +2,6 @@ package apns
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 )
 
@@ -26,9 +25,4 @@ func (r Error) Time() time.Time {
 // Status возвращает код HTTP-ответа сервера.
 func (r Error) Status() int {
 	return r.Code
-}
-
-// Status возвращает текстовое описание кода HTTP-ответа сервера.
-func (r Error) StatusText() string {
-	return http.StatusText(r.Code)
 }
