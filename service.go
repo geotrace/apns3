@@ -1,7 +1,3 @@
-// +build go1.6
-
-// apns является библиотекой для отправки уведомлений через сервис Apple Push Notification Server
-// через HTTP/2 интерфейс.
 package apns
 
 import (
@@ -22,8 +18,8 @@ const (
 
 // Service описывает сервис для отправки уведомлений на устройства.
 type Service struct {
-	url    string // адрес для запроса
-	client *http.Client
+	url    string       // адрес для запроса
+	client *http.Client // клиент для доступа к сервису
 }
 
 // New инициализирует и возвращает сервис для отправки уведомлений.
@@ -84,9 +80,9 @@ func (s *Service) Push(token []byte, payload interface{}, options *Options) (id 
 		id = resp.Header.Get("apns-id")
 		return // все хорошо — возвращаем идентификатор
 	}
-	var response ErrResponse                     // описание ошибки
+	var response Error                           // описание ошибки
 	json.NewDecoder(resp.Body).Decode(&response) // декодируем описание ошибки и возвращаем его
-	response.Status = resp.StatusCode            // добавляем код статуса ответа
+	response.Code = resp.StatusCode              // добавляем код статуса ответа
 	err = response
 	return
 }
@@ -98,21 +94,4 @@ type Options struct {
 	Expire      time.Time // доставить до или не доставлять уже
 	LowPriority bool      // низкий приоритет доставки
 	Topic       string    // тема для сертификата с поддержкой нескольких тем
-}
-
-// ErrResponse описывает ответ от сервера
-type ErrResponse struct { // для разбора ответа с ошибкой
-	Status    int    // статус кода ответа сервера
-	Reason    string `json:"reason"`    // ошибка
-	Timestamp int64  `json:"timestamp"` // временная метка
-}
-
-// Error возвращает описание ошибки.
-func (r ErrResponse) Error() string {
-	return fmt.Sprintf("[%d] %s", r.Status, r.Reason)
-}
-
-// Time возвращает временную метку приведенной к формату времени.
-func (r ErrResponse) Time() time.Time {
-	return time.Unix(r.Timestamp, 0)
 }
