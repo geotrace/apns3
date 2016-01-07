@@ -4,3 +4,7 @@
 [![Build Status](https://travis-ci.org/geotrace/apns3.svg)](https://travis-ci.org/geotrace/apns3)
 
 Поддержка Apple Push Notification Service через HTTP/2 протокол.
+
+> **ВНИМАНИЕ!**
+>
+> Для работы требуется Go 1.6 или старше, т.к. требуется поддержка HTTP/2 протокола.
