@@ -1,4 +1,4 @@
-// +build go1.6
+//+build go1.6
 package apns
 
 import (
@@ -81,7 +81,7 @@ func (s *Service) Push(token []byte, payload interface{}, options *Options) (id 
 		id = resp.Header.Get("apns-id")
 		return // все хорошо — возвращаем идентификатор
 	}
-	var response ErrResponse                     // описание ошибки
+	var response Error                           // описание ошибки
 	json.NewDecoder(resp.Body).Decode(&response) // декодируем описание ошибки и возвращаем его
 	response.Code = resp.StatusCode              // добавляем код статуса ответа
 	err = response
