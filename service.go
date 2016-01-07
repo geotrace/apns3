@@ -43,7 +43,7 @@ func New(url string, cert tls.Certificate) *Service {
 // Push отправляет на сервер уведомление payload для устройства с токеном token. Так же можно
 // опционально указать дополнительные параметры для отправки сообщения в options.
 // В ответ возвращается уникальный идентификатор сообщения или ошибка.
-func (s *Service) Push(token string, payload interface{}, options *Options) (id string, err error) {
+func (s *Service) Push(token []byte, payload interface{}, options *Options) (id string, err error) {
 	var (
 		data []byte // данные для отправки
 		ok   bool   // флаг, что данные уже в нужном формате
@@ -55,7 +55,7 @@ func (s *Service) Push(token string, payload interface{}, options *Options) (id 
 		}
 	}
 	// формируем запрос с данными
-	req, err := http.NewRequest("POST", s.url+token, bytes.NewReader(data))
+	req, err := http.NewRequest("POST", s.url+string(token), bytes.NewReader(data))
 	if err != nil {
 		return
 	}
@@ -86,7 +86,7 @@ func (s *Service) Push(token string, payload interface{}, options *Options) (id 
 	}
 	var response ErrResponse                     // описание ошибки
 	json.NewDecoder(resp.Body).Decode(&response) // декодируем описание ошибки и возвращаем его
-	response.Code = resp.StatusCode              // добавляем код статуса ответа
+	response.Status = resp.StatusCode            // добавляем код статуса ответа
 	err = response
 	return
 }
@@ -102,14 +102,14 @@ type Options struct {
 
 // ErrResponse описывает ответ от сервера
 type ErrResponse struct { // для разбора ответа с ошибкой
-	Code      int    // статус кода ответа сервера
+	Status    int    // статус кода ответа сервера
 	Reason    string `json:"reason"`    // ошибка
 	Timestamp int64  `json:"timestamp"` // временная метка
 }
 
 // Error возвращает описание ошибки.
 func (r ErrResponse) Error() string {
-	return fmt.Sprint(r.Reason)
+	return fmt.Sprintf("[%d] %s", r.Status, r.Reason)
 }
 
 // Time возвращает временную метку приведенной к формату времени.
