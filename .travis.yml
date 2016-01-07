@@ -1,7 +1,5 @@
 language: go
 go:
   - tip
-services:
-  - mongodb
 notifications:
   email: false
