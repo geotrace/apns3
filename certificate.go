@@ -14,8 +14,8 @@ func Certificate(p12 []byte, password string) (tlsCert tls.Certificate, err erro
 	if err != nil {
 		return
 	}
-	// Проверяем валидность сертификата. Игнорируем ошибку UnknownAuthority, т.к. сертификаты
-	// Apple не входят в основной пул сертификатов.
+	// Проверяем валидность сертификата. Игнорируем ошибку UnknownAuthority,
+	// т.к. сертификаты Apple не входят в основной пул сертификатов.
 	if _, err = cert.Verify(x509.VerifyOptions{}); err != nil {
 		if _, ok := err.(x509.UnknownAuthorityError); !ok {
 			return
@@ -29,8 +29,8 @@ func Certificate(p12 []byte, password string) (tlsCert tls.Certificate, err erro
 	return
 }
 
-// LoadTLSCertificate загружает и разбирает сертификат в формате p12 из файла. Возвращает разобранный
-// сертификат или ошибку.
+// LoadTLSCertificate загружает и разбирает сертификат в формате p12 из файла.
+// Возвращает разобранный сертификат или ошибку.
 func LoadCertificate(filename, password string) (tlsCert tls.Certificate, err error) {
 	p12, err := ioutil.ReadFile(filename)
 	if err != nil {

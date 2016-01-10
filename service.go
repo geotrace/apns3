@@ -29,42 +29,50 @@ func New(url string, cert tls.Certificate) *Service {
 	}
 	config.BuildNameToCertificate()
 	return &Service{
-		url: fmt.Sprintf("%v/3/device/", url), // добавляем адрес для отправки токена
+		// добавляем адрес для отправки токена
+		url: fmt.Sprintf("%v/3/device/", url),
 		client: &http.Client{ // инициализируем HTTP Client с сертификатом
 			Transport: &http.Transport{TLSClientConfig: config},
 		},
 	}
 }
 
-// Push отправляет на сервер уведомление payload для устройства с токеном token. Так же можно
-// опционально указать дополнительные параметры для отправки сообщения в options.
-// В ответ возвращается уникальный идентификатор сообщения или ошибка.
+// Push отправляет на сервер уведомление payload для устройства с токеном token.
+// Так же можно опционально указать дополнительные параметры для отправки
+// сообщения в options. В ответ возвращается уникальный идентификатор сообщения
+// или ошибка.
 func (s *Service) Push(token []byte, payload interface{}, options *Options) (id string, err error) {
 	var (
 		data []byte // данные для отправки
 		ok   bool   // флаг, что данные уже в нужном формате
 	)
-	if data, ok = payload.([]byte); !ok { // проверяем, что данные уже готовы для отправки
-		data, err = json.Marshal(payload) // переводим содержимое для отправки в формат JSON
+	// проверяем, что данные уже готовы для отправки
+	if data, ok = payload.([]byte); !ok {
+		// переводим содержимое для отправки в формат JSON
+		data, err = json.Marshal(payload)
 		if err != nil {
 			return
 		}
 	}
 	// формируем запрос с данными
-	req, err := http.NewRequest("POST", s.url+string(token), bytes.NewReader(data))
+	req, err := http.NewRequest("POST", s.url+string(token),
+		bytes.NewReader(data))
 	if err != nil {
 		return
 	}
-	req.Header.Set("Content-Type", "application/json") // устанавливаем тип данных
+	// устанавливаем тип данных
+	req.Header.Set("Content-Type", "application/json")
 	// устанавливаем дополнительные заголовки запроса, если они определены
 	if options != nil {
 		if options.ID != "" {
 			req.Header.Set("apns-id", options.ID)
 		}
 		if !options.Expire.IsZero() {
-			req.Header.Set("apns-expiration", strconv.FormatInt(options.Expire.Unix(), 10))
+			req.Header.Set("apns-expiration",
+				strconv.FormatInt(options.Expire.Unix(), 10))
 		}
-		if options.LowPriority { // если не установлено, то приоритет считается 10
+		// если не установлено, то приоритет считается 10
+		if options.LowPriority {
 			req.Header.Set("apns-priority", "5")
 		}
 		if options.Topic != "" {
@@ -80,15 +88,16 @@ func (s *Service) Push(token []byte, payload interface{}, options *Options) (id 
 		id = resp.Header.Get("apns-id")
 		return // все хорошо — возвращаем идентификатор
 	}
-	var response Error                           // описание ошибки
-	json.NewDecoder(resp.Body).Decode(&response) // декодируем описание ошибки и возвращаем его
-	response.Code = resp.StatusCode              // добавляем код статуса ответа
+	var response Error // описание ошибки
+	// декодируем описание ошибки и возвращаем его
+	json.NewDecoder(resp.Body).Decode(&response)
+	response.Code = resp.StatusCode // добавляем код статуса ответа
 	err = response
 	return
 }
 
-// Options добавляет к отправляемому сообщению дополнительные необязательные данные, которые
-// уточняют поведение сервиса.
+// Options добавляет к отправляемому сообщению дополнительные необязательные
+// данные, которые уточняют поведение сервиса.
 type Options struct {
 	ID          string    // назначить уникальный идентификатор
 	Expire      time.Time // доставить до или не доставлять уже
