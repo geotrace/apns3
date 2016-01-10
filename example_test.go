@@ -7,10 +7,11 @@ import (
 	"time"
 
 	"github.com/mdigger/apns3"
+	"github.com/mdigger/p12"
 )
 
 func Example() {
-	cert, err := apns.LoadCertificate("cert.p12", "password")
+	cert, err := p12.Load("cert.p12", "password")
 	if err != nil {
 		log.Fatalln("Error loading certificate:", err)
 	}

@@ -34,6 +34,7 @@ import (
 	"os"
 
 	"github.com/mdigger/apns3"
+	"github.com/mdigger/p12"
 )
 
 func main() {
@@ -89,7 +90,7 @@ func main() {
 	} else {
 		log.Fatalln("Nothing to send")
 	}
-	cert, err := apns.LoadCertificate(*certFileName, *password)
+	cert, err := p12.Load(*certFileName, *password)
 	if err != nil {
 		log.Fatalln("Error loading certificate:", err)
 	}
